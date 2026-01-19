@@ -60,6 +60,11 @@ Format code:
 mise run elixir:format
 ```
 
+Regenerate fixtures:
+```bash
+mise run regenerate_fixtures
+```
+
 ## License
 
 MIT License - See individual implementation files for details.

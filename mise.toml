@@ -19,3 +19,6 @@ run = 'cd elixir && mix format'
 
 [tasks."elixir:compile"]
 run = 'cd elixir && mix compile'
+
+[tasks."regenerate_fixtures"]
+run = 'cd elixir && mix generate_fixtures ../fixtures/pfid_fixtures.csv'

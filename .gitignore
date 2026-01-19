@@ -25,5 +25,23 @@ Thumbs.db
 /typescript/coverage/
 /typescript/*.tsbuildinfo
 
+# Python
+/python/.venv/
+/python/__pycache__/
+/python/src/**/__pycache__/
+/python/tests/__pycache__/
+/python/*.egg-info/
+/python/src/*.egg-info/
+/python/dist/
+/python/build/
+/python/.pytest_cache/
+/python/.mypy_cache/
+/python/.ruff_cache/
+/python/coverage/
+/python/.coverage
+/python/htmlcov/
+*.pyc
+*.pyo
+
 # Misc
 *.log

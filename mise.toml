@@ -3,6 +3,7 @@ erlang = "28.3"
 elixir = "1.19.4-otp-28"
 node = "24"
 pnpm = "10"
+python = "3.13"
 
 [env]
 ERL_AFLAGS="-kernel shell_history enabled"
@@ -36,3 +37,15 @@ run = 'cd typescript && pnpm run build'
 
 [tasks."typescript:typecheck"]
 run = 'cd typescript && pnpm run typecheck'
+
+[tasks."python:deps"]
+run = 'cd python && pip install -e ".[dev]"'
+
+[tasks."python:test"]
+run = 'cd python && pytest'
+
+[tasks."python:typecheck"]
+run = 'cd python && mypy src/pfid'
+
+[tasks."python:lint"]
+run = 'cd python && ruff check src/pfid tests'

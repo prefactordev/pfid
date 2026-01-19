@@ -18,5 +18,12 @@ Thumbs.db
 *.swo
 *~
 
+# TypeScript
+/typescript/dist/
+/typescript/node_modules/
+/typescript/.tsbuildinfo
+/typescript/coverage/
+/typescript/*.tsbuildinfo
+
 # Misc
 *.log

@@ -11,6 +11,7 @@ PFID is a ULID-like identifier format with partition support. It consists of:
 ## Structure
 
 - `elixir/` - Elixir implementation
+- `typescript/` - TypeScript implementation
 
 ## Development Setup
 
@@ -63,6 +64,33 @@ mise run elixir:format
 Regenerate fixtures:
 ```bash
 mise run regenerate_fixtures
+```
+
+### TypeScript Development
+
+Navigate to the typescript directory:
+```bash
+cd typescript
+```
+
+Install dependencies:
+```bash
+mise run typescript:deps
+```
+
+Run tests:
+```bash
+mise run typescript:test
+```
+
+Type check:
+```bash
+mise run typescript:typecheck
+```
+
+Build:
+```bash
+mise run typescript:build
 ```
 
 ## License

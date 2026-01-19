@@ -1,6 +1,8 @@
 [tools]
 erlang = "28.3"
 elixir = "1.19.4-otp-28"
+node = "24"
+pnpm = "10"
 
 [env]
 ERL_AFLAGS="-kernel shell_history enabled"
@@ -22,3 +24,15 @@ run = 'cd elixir && mix compile'
 
 [tasks."regenerate_fixtures"]
 run = 'cd elixir && mix generate_fixtures ../fixtures/pfid_fixtures.csv'
+
+[tasks."typescript:deps"]
+run = 'cd typescript && pnpm install'
+
+[tasks."typescript:test"]
+run = 'cd typescript && pnpm test'
+
+[tasks."typescript:build"]
+run = 'cd typescript && pnpm run build'
+
+[tasks."typescript:typecheck"]
+run = 'cd typescript && pnpm run typecheck'

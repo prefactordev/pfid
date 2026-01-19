@@ -1,0 +1,25 @@
+{
+  "name": "@prefactor/pfid",
+  "version": "0.1.0",
+  "description": "PFID - A ULID-like identifier with partition support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "pfid",
+    "ulid",
+    "identifier",
+    "partition"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.10.9",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  }
+}

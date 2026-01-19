@@ -8,6 +8,28 @@ python = "3.13"
 [env]
 ERL_AFLAGS="-kernel shell_history enabled"
 
+# Top-level aggregate tasks
+[tasks.deps]
+description = "Install dependencies for all codebases"
+depends = ["elixir:deps", "typescript:deps", "python:deps"]
+
+[tasks.test]
+description = "Run tests for all codebases"
+depends = ["elixir:test", "typescript:test", "python:test"]
+
+[tasks.typecheck]
+description = "Run type checking for all codebases"
+depends = ["typescript:typecheck", "python:typecheck"]
+
+[tasks.build]
+description = "Build all codebases"
+depends = ["elixir:compile", "typescript:build"]
+
+[tasks.check]
+description = "Run all checks (tests, typecheck, lint, build)"
+depends = ["test", "typecheck", "python:lint", "build"]
+
+# Elixir tasks
 [tasks."elixir:test"]
 run = 'cd elixir && mix test'
 

@@ -4,7 +4,7 @@ import { join } from 'path';
 import {
   encode,
   decode,
-  extractPartitionOrThrow,
+  extractPartition,
   isPfid,
 } from '../src';
 
@@ -37,29 +37,21 @@ function validateFixture(line: string): void {
   randomness.copy(binary, 10);
 
   // Test encoding
-  const encodeResult = encode(binary);
-  expect(encodeResult.ok).toBe(true);
-  if (!encodeResult.ok) {
-    throw new Error('Encoding failed');
-  }
+  const encoded = encode(binary);
   expect(
-    encodeResult.value,
-    `Encoded PFID does not match expected value. Got: ${encodeResult.value}, Expected: ${expectedPfid}`
+    encoded,
+    `Encoded PFID does not match expected value. Got: ${encoded}, Expected: ${expectedPfid}`
   ).toBe(expectedPfid);
 
   // Test decoding
-  const decodeResult = decode(expectedPfid);
-  expect(decodeResult.ok).toBe(true);
-  if (!decodeResult.ok) {
-    throw new Error('Decoding failed');
-  }
+  const decoded = decode(expectedPfid);
   expect(
-    decodeResult.value,
+    decoded,
     'Decoded binary does not match original'
   ).toEqual(binary);
 
   // Test partition extraction
-  const extractedPartition = extractPartitionOrThrow(expectedPfid);
+  const extractedPartition = extractPartition(expectedPfid);
   expect(
     extractedPartition,
     `Extracted partition does not match expected value. Got: ${extractedPartition}, Expected: ${partition}`

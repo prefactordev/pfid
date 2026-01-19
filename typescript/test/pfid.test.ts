@@ -12,7 +12,6 @@ import {
   encode,
   decode,
   extractPartition,
-  extractPartitionOrThrow,
   generatePartition,
   PfidError,
 } from '../src';
@@ -29,7 +28,7 @@ describe('generate', () => {
     const pfid = generate(partition);
 
     expect(isPfid(pfid)).toBe(true);
-    expect(extractPartitionOrThrow(pfid)).toBe(partition);
+    expect(extractPartition(pfid)).toBe(partition);
   });
 
   test('generates unique PFIDs', () => {
@@ -55,7 +54,7 @@ describe('generateWithTimestamp', () => {
     const pfid = generateWithTimestamp(partition, timestamp);
 
     expect(isPfid(pfid)).toBe(true);
-    expect(extractPartitionOrThrow(pfid)).toBe(partition);
+    expect(extractPartition(pfid)).toBe(partition);
   });
 
   test('throws on invalid timestamp', () => {
@@ -69,7 +68,7 @@ describe('generateExample', () => {
     const pfid = generateExample();
 
     expect(isPfid(pfid)).toBe(true);
-    expect(extractPartitionOrThrow(pfid)).toBe(123_456_789);
+    expect(extractPartition(pfid)).toBe(123_456_789);
   });
 });
 
@@ -79,8 +78,8 @@ describe('generateRelated', () => {
     const relatedPfid = generateRelated(originalPfid);
 
     expect(isPfid(relatedPfid)).toBe(true);
-    expect(extractPartitionOrThrow(relatedPfid)).toBe(
-      extractPartitionOrThrow(originalPfid)
+    expect(extractPartition(relatedPfid)).toBe(
+      extractPartition(originalPfid)
     );
   });
 });
@@ -90,7 +89,7 @@ describe('generateRoot', () => {
     const pfid = generateRoot();
 
     expect(isPfid(pfid)).toBe(true);
-    const partition = extractPartitionOrThrow(pfid);
+    const partition = extractPartition(pfid);
     expect(partition).toBeGreaterThanOrEqual(0);
     expect(partition).toBeLessThan(1_073_741_824);
   });
@@ -102,11 +101,8 @@ describe('generateBinary', () => {
     const binary = generateBinary(partition);
 
     expect(binary.length).toBe(20);
-    const result = encode(binary);
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(isPfid(result.value)).toBe(true);
-    }
+    const encoded = encode(binary);
+    expect(isPfid(encoded)).toBe(true);
   });
 });
 
@@ -117,11 +113,8 @@ describe('generateBinaryWithTimestamp', () => {
     const binary = generateBinaryWithTimestamp(partition, timestamp);
 
     expect(binary.length).toBe(20);
-    const result = encode(binary);
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(isPfid(result.value)).toBe(true);
-    }
+    const encoded = encode(binary);
+    expect(isPfid(encoded)).toBe(true);
   });
 });
 
@@ -153,35 +146,20 @@ describe('encode', () => {
   test('encodes a valid binary', () => {
     const partition = 123_456_789;
     const binary = generateBinary(partition);
-    const result = encode(binary);
+    const encoded = encode(binary);
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(isPfid(result.value)).toBe(true);
-      expect(extractPartitionOrThrow(result.value)).toBe(partition);
-    }
+    expect(isPfid(encoded)).toBe(true);
+    expect(extractPartition(encoded)).toBe(partition);
   });
 
-  test('returns error for invalid binary size', () => {
-    const result = encode(Buffer.from([1, 2, 3]));
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('invalid_binary');
-    }
+  test('throws error for invalid binary size', () => {
+    expect(() => encode(Buffer.from([1, 2, 3]))).toThrow(PfidError);
+    expect(() => encode(Buffer.from([1, 2, 3]))).toThrow(/invalid binary/);
   });
 
-  test('returns error for non-binary', () => {
-    const result1 = encode('not binary' as any);
-    expect(result1.ok).toBe(false);
-    if (!result1.ok) {
-      expect(result1.error.code).toBe('invalid_binary');
-    }
-
-    const result2 = encode(123 as any);
-    expect(result2.ok).toBe(false);
-    if (!result2.ok) {
-      expect(result2.error.code).toBe('invalid_binary');
-    }
+  test('throws error for non-binary', () => {
+    expect(() => encode('not binary' as any)).toThrow(PfidError);
+    expect(() => encode(123 as any)).toThrow(PfidError);
   });
 });
 
@@ -189,39 +167,21 @@ describe('decode', () => {
   test('decodes a valid PFID', () => {
     const partition = 123_456_789;
     const pfid = generate(partition);
-    const result = decode(pfid);
+    const binary = decode(pfid);
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.value.length).toBe(20);
-      const encodeResult = encode(result.value);
-      expect(encodeResult.ok).toBe(true);
-      if (encodeResult.ok) {
-        expect(encodeResult.value).toBe(pfid);
-      }
-    }
+    expect(binary.length).toBe(20);
+    const encoded = encode(binary);
+    expect(encoded).toBe(pfid);
   });
 
-  test('returns error for invalid PFID', () => {
-    const result1 = decode('invalid');
-    expect(result1.ok).toBe(false);
-    if (!result1.ok) {
-      expect(result1.error.code).toBe('invalid_pfid');
-    }
-
-    const result2 = decode('');
-    expect(result2.ok).toBe(false);
-    if (!result2.ok) {
-      expect(result2.error.code).toBe('invalid_pfid');
-    }
+  test('throws error for invalid PFID', () => {
+    expect(() => decode('invalid')).toThrow(PfidError);
+    expect(() => decode('invalid')).toThrow(/invalid PFID/);
+    expect(() => decode('')).toThrow(PfidError);
   });
 
-  test('returns error for non-string', () => {
-    const result = decode(123 as any);
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('invalid_pfid');
-    }
+  test('throws error for non-string', () => {
+    expect(() => decode(123 as any)).toThrow(PfidError);
   });
 });
 
@@ -229,33 +189,14 @@ describe('extractPartition', () => {
   test('extracts partition from valid PFID', () => {
     const partition = 123_456_789;
     const pfid = generate(partition);
-    const result = extractPartition(pfid);
+    const extracted = extractPartition(pfid);
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.value).toBe(partition);
-    }
+    expect(extracted).toBe(partition);
   });
 
-  test('returns error for invalid PFID', () => {
-    const result = extractPartition('invalid');
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.code).toBe('invalid_pfid');
-    }
-  });
-});
-
-describe('extractPartitionOrThrow', () => {
-  test('extracts partition from valid PFID', () => {
-    const partition = 123_456_789;
-    const pfid = generate(partition);
-
-    expect(extractPartitionOrThrow(pfid)).toBe(partition);
-  });
-
-  test('throws on invalid PFID', () => {
-    expect(() => extractPartitionOrThrow('invalid')).toThrow(PfidError);
+  test('throws error for invalid PFID', () => {
+    expect(() => extractPartition('invalid')).toThrow(PfidError);
+    expect(() => extractPartition('invalid')).toThrow(/invalid PFID/);
   });
 });
 
@@ -284,30 +225,18 @@ describe('round-trip encoding/decoding', () => {
     const partition = 123_456_789;
     const pfid = generate(partition);
 
-    const decodeResult = decode(pfid);
-    expect(decodeResult.ok).toBe(true);
-    if (decodeResult.ok) {
-      const encodeResult = encode(decodeResult.value);
-      expect(encodeResult.ok).toBe(true);
-      if (encodeResult.ok) {
-        expect(encodeResult.value).toBe(pfid);
-      }
-    }
+    const binary = decode(pfid);
+    const encoded = encode(binary);
+    expect(encoded).toBe(pfid);
   });
 
   test('binary encode and decode are inverse operations', () => {
     const partition = 123_456_789;
     const binary = generateBinary(partition);
 
-    const encodeResult = encode(binary);
-    expect(encodeResult.ok).toBe(true);
-    if (encodeResult.ok) {
-      const decodeResult = decode(encodeResult.value);
-      expect(decodeResult.ok).toBe(true);
-      if (decodeResult.ok) {
-        expect(decodeResult.value).toEqual(binary);
-      }
-    }
+    const encoded = encode(binary);
+    const decoded = decode(encoded);
+    expect(decoded).toEqual(binary);
   });
 });
 
@@ -320,7 +249,7 @@ describe('partition consistency', () => {
       pfids.push(generate(partition));
     }
 
-    const partitions = pfids.map((pfid) => extractPartitionOrThrow(pfid));
+    const partitions = pfids.map((pfid) => extractPartition(pfid));
 
     expect(partitions.every((p) => p === partition)).toBe(true);
   });

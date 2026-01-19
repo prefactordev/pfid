@@ -27,9 +27,9 @@ import {
   generateRoot,
   isPfid,
   extractPartition,
-  extractPartitionOrThrow,
   encode,
   decode,
+  PfidError,
 } from './src';
 
 // Generate a PFID with a partition
@@ -53,28 +53,35 @@ if (isPfid(pfid)) {
   console.log('Valid PFID');
 }
 
-// Extract partition
-const partition = extractPartitionOrThrow(pfid);
-console.log(partition); // 123456789
-
-// Or with error handling
-const result = extractPartition(pfid);
-if (result.ok) {
-  console.log(result.value);
+// Extract partition (throws PfidError on invalid input)
+try {
+  const partition = extractPartition(pfid);
+  console.log(partition); // 123456789
+} catch (error) {
+  if (error instanceof PfidError) {
+    console.error('Invalid PFID:', error.message);
+  }
 }
 
-// Encode binary to PFID
-const binary = generateBinary(123_456_789);
-const encodeResult = encode(binary);
-if (encodeResult.ok) {
-  console.log(encodeResult.value);
+// Encode binary to PFID (throws PfidError on invalid input)
+try {
+  const binary = generateBinary(123_456_789);
+  const encoded = encode(binary);
+  console.log(encoded);
+} catch (error) {
+  if (error instanceof PfidError) {
+    console.error('Encoding failed:', error.message);
+  }
 }
 
-// Decode PFID to binary
-const decodeResult = decode(pfid);
-if (decodeResult.ok) {
-  const binary = decodeResult.value;
+// Decode PFID to binary (throws PfidError on invalid input)
+try {
+  const binary = decode(pfid);
   console.log(binary.length); // 20 bytes
+} catch (error) {
+  if (error instanceof PfidError) {
+    console.error('Decoding failed:', error.message);
+  }
 }
 ```
 
@@ -95,10 +102,9 @@ if (decodeResult.ok) {
 ### Validation and Conversion
 
 - `isPfid(string: unknown)`: Check if a string is a valid PFID
-- `encode(binary: BinaryPfid)`: Encode binary to PFID string (returns Result)
-- `decode(pfid: string)`: Decode PFID string to binary (returns Result)
-- `extractPartition(pfid: string)`: Extract partition from PFID (returns Result)
-- `extractPartitionOrThrow(pfid: string)`: Extract partition, throws on error
+- `encode(binary: BinaryPfid)`: Encode binary to PFID string (throws `PfidError` on invalid input)
+- `decode(pfid: string)`: Decode PFID string to binary (throws `PfidError` on invalid input)
+- `extractPartition(pfid: string)`: Extract partition from PFID (throws `PfidError` on invalid input)
 
 ### Types
 
@@ -109,16 +115,26 @@ if (decodeResult.ok) {
 
 ### Error Handling
 
-The library uses a Result pattern for operations that can fail:
+The library uses standard TypeScript exception handling. Functions that can fail will throw a `PfidError`:
 
 ```typescript
-type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+import { PfidError } from './src';
+
+try {
+  const partition = extractPartition(pfid);
+  // Use partition...
+} catch (error) {
+  if (error instanceof PfidError) {
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+  }
+}
 ```
 
-Functions that return Results:
-- `encode()`: Returns `Result<Pfid, PfidError>`
-- `decode()`: Returns `Result<BinaryPfid, PfidError>`
-- `extractPartition()`: Returns `Result<Partition, PfidError>`
+Functions that throw `PfidError`:
+- `encode()`: Throws on invalid binary input
+- `decode()`: Throws on invalid PFID string
+- `extractPartition()`: Throws on invalid PFID string
 
 ## Development
 

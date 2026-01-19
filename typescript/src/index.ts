@@ -11,7 +11,6 @@ export {
   encode,
   decode,
   extractPartition,
-  extractPartitionOrThrow,
   generatePartition,
   type Pfid,
   type BinaryPfid,

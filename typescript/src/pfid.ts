@@ -82,7 +82,7 @@ export function generateExample(): Pfid {
  * Generate an ID with the same partition as an existing PFID.
  */
 export function generateRelated(existingPfid: Pfid): Pfid {
-  return generate(extractPartitionOrThrow(existingPfid));
+  return generate(extractPartition(existingPfid));
 }
 
 /**
@@ -164,76 +164,70 @@ export function isPfid(string: unknown): boolean {
 
 /**
  * Encode a binary PFID to a Crockford Base32 string.
+ * @throws {PfidError} If the binary is invalid
  */
-export function encode(binary: BinaryPfid): { ok: true; value: Pfid } | { ok: false; error: PfidError } {
+export function encode(binary: BinaryPfid): Pfid {
   if (!Buffer.isBuffer(binary) || binary.length !== 20) {
-    return { ok: false, error: PfidError.make('invalid_binary', binary) };
+    throw PfidError.make('invalid_binary', binary);
   }
 
   try {
     const encoded = unsafeEncode(binary);
     if (isPfid(encoded)) {
-      return { ok: true, value: encoded };
+      return encoded;
     } else {
-      return { ok: false, error: PfidError.make('invalid_binary', binary) };
+      throw PfidError.make('invalid_binary', binary);
     }
   } catch (error) {
-    return { ok: false, error: PfidError.make('invalid_binary', binary) };
+    if (error instanceof PfidError) {
+      throw error;
+    }
+    throw PfidError.make('invalid_binary', binary);
   }
 }
 
 /**
  * Decode a Crockford Base32 PFID string to binary.
+ * @throws {PfidError} If the PFID is invalid
  */
-export function decode(pfid: string): { ok: true; value: BinaryPfid } | { ok: false; error: PfidError } {
+export function decode(pfid: string): BinaryPfid {
   if (typeof pfid !== 'string' || pfid.length !== 32) {
-    return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
+    throw PfidError.make('invalid_pfid', pfid);
   }
 
   // First character must be 0-7
   if (pfid[0] < '0' || pfid[0] > '7') {
-    return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
+    throw PfidError.make('invalid_pfid', pfid);
   }
 
   try {
-    const binary = unsafeDecode(pfid);
-    return { ok: true, value: binary };
+    return unsafeDecode(pfid);
   } catch (error) {
-    return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
+    if (error instanceof PfidError) {
+      throw error;
+    }
+    throw PfidError.make('invalid_pfid', pfid);
   }
 }
 
 /**
  * Extract partition from a PFID string.
+ * @throws {PfidError} If the PFID is invalid
  */
-export function extractPartition(pfid: string): { ok: true; value: Partition } | { ok: false; error: PfidError } {
+export function extractPartition(pfid: string): Partition {
   if (!isPfid(pfid)) {
-    return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
+    throw PfidError.make('invalid_pfid', pfid);
   }
 
   try {
     // Extract the partition portion (characters 10-15, 6 characters = 30 bits)
     const partitionStr = pfid.substring(10, 16);
-    const result = decodePartition(partitionStr);
-    if (result.ok) {
-      return result;
-    } else {
-      return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
-    }
+    return decodePartition(partitionStr);
   } catch (error) {
-    return { ok: false, error: PfidError.make('invalid_pfid', pfid) };
-  }
-}
-
-/**
- * Extract partition from a PFID string, throwing on error.
- */
-export function extractPartitionOrThrow(pfid: string): Partition {
-  const result = extractPartition(pfid);
-  if (result.ok) {
-    return result.value;
-  } else {
-    throw result.error;
+    if (error instanceof PfidError) {
+      throw error;
+    }
+    throw PfidError.make('invalid_pfid', pfid);
   }
 }
 
@@ -432,10 +426,11 @@ function unsafeDecode(pfid: string): BinaryPfid {
 
 /**
  * Decode partition from 6-character encoded partition string.
+ * @throws {PfidError} If the partition string is invalid
  */
-function decodePartition(partitionStr: string): { ok: true; value: Partition } | { ok: false; error: PfidError } {
+function decodePartition(partitionStr: string): Partition {
   if (typeof partitionStr !== 'string' || partitionStr.length !== 6) {
-    return { ok: false, error: PfidError.make('invalid_partition', partitionStr) };
+    throw PfidError.make('invalid_partition', partitionStr);
   }
 
   try {
@@ -456,8 +451,11 @@ function decodePartition(partitionStr: string): { ok: true; value: Partition } |
 
     // Read as 32-bit unsigned integer, mask to 30 bits
     const partition = buffer.readUInt32BE(0) & 0x3fffffff;
-    return { ok: true, value: partition };
+    return partition;
   } catch (error) {
-    return { ok: false, error: PfidError.make('invalid_partition', partitionStr) };
+    if (error instanceof PfidError) {
+      throw error;
+    }
+    throw PfidError.make('invalid_partition', partitionStr);
   }
 }

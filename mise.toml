@@ -71,3 +71,8 @@ run = 'cd python && mypy src/pfid'
 
 [tasks."python:lint"]
 run = 'cd python && ruff check src/pfid tests'
+
+[tasks."typescript:publish"]
+description = "Publish typescript package to npm (fetches OTP from 1Password)"
+depends = ["typescript:test", "typescript:typecheck", "typescript:build"]
+run = 'cd typescript && pnpm publish --otp=$(op item get npmjs.com --otp)'

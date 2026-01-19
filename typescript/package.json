@@ -1,14 +1,18 @@
 {
-  "name": "@prefactor/pfid",
+  "name": "@prefactor-ai/pfid",
   "version": "0.1.0",
   "description": "PFID - A ULID-like identifier with partition support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build"
   },
   "keywords": [
     "pfid",
@@ -17,6 +21,14 @@
     "partition"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prefactor-ai/pfid.git",
+    "directory": "typescript"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/node": "^24.10.9",
     "typescript": "^5.9.3",

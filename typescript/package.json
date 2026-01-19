@@ -1,5 +1,5 @@
 {
-  "name": "@prefactor-ai/pfid",
+  "name": "@prefactor/pfid",
   "version": "0.1.0",
   "description": "PFID - A ULID-like identifier with partition support",
   "main": "dist/index.js",

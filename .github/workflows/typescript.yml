@@ -1,0 +1,54 @@
+name: TypeScript
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "typescript/**"
+      - "fixtures/**"
+      - ".github/workflows/typescript.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "typescript/**"
+      - "fixtures/**"
+      - ".github/workflows/typescript.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ["20", "22", "24"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+          cache-dependency-path: typescript/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: typescript
+        run: pnpm install
+
+      - name: Type check
+        working-directory: typescript
+        run: pnpm run typecheck
+
+      - name: Build
+        working-directory: typescript
+        run: pnpm run build
+
+      - name: Run tests
+        working-directory: typescript
+        run: pnpm test

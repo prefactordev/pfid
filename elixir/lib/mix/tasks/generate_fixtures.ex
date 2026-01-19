@@ -104,7 +104,7 @@ defmodule Mix.Tasks.GenerateFixtures do
     # Use a fixed seed for reproducibility
     :rand.seed(:exsplus, {1, 2, 3})
 
-    for _ <- 1..200 do
+    for _ <- 1..1200 do
       timestamp = :rand.uniform(@max_timestamp + 1) - 1
       partition = :rand.uniform(@max_partition + 1) - 1
       randomness = :crypto.strong_rand_bytes(10)

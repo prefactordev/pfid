@@ -76,3 +76,12 @@ run = 'cd python && ruff check src/pfid tests'
 description = "Publish typescript package to npm (fetches OTP from 1Password)"
 depends = ["typescript:test", "typescript:typecheck", "typescript:build"]
 run = 'cd typescript && pnpm publish --otp=$(op item get npmjs.com --otp)'
+
+[tasks."python:build"]
+description = "Build Python package"
+run = 'cd python && python -m build'
+
+[tasks."python:publish"]
+description = "Publish Python package to PyPI (fetches OTP from 1Password)"
+depends = ["python:test", "python:typecheck", "python:build"]
+run = 'cd python && twine upload dist/* --username __token__ --password $(op item get pypi.org --field token)'

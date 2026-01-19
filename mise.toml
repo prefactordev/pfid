@@ -1,0 +1,21 @@
+[tools]
+erlang = "28.3"
+elixir = "1.19.4-otp-28"
+
+[env]
+ERL_AFLAGS="-kernel shell_history enabled"
+
+[tasks."elixir:test"]
+run = 'cd elixir && mix test'
+
+[tasks."elixir:console"]
+run = 'cd elixir && iex -S mix'
+
+[tasks."elixir:deps"]
+run = 'cd elixir && mix deps.get'
+
+[tasks."elixir:format"]
+run = 'cd elixir && mix format'
+
+[tasks."elixir:compile"]
+run = 'cd elixir && mix compile'

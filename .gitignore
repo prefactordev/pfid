@@ -47,3 +47,4 @@ Thumbs.db
 *.log
 
 /elixir/cover
+/elixir/doc

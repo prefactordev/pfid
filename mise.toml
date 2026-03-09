@@ -45,6 +45,11 @@ run = 'cd elixir && mix format'
 [tasks."elixir:compile"]
 run = 'cd elixir && mix compile'
 
+[tasks."elixir:publish"]
+description = "Publish Elixir package to Hex (fetches API key from 1Password)"
+depends = ["elixir:test"]
+run = 'cd elixir && HEX_API_KEY=$(op item get hex.pm --field credential --reveal) mix hex.publish --yes'
+
 [tasks."regenerate_fixtures"]
 run = 'cd elixir && mix generate_fixtures ../fixtures/pfid_fixtures.csv'
 

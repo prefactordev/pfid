@@ -9,7 +9,8 @@ defmodule Pfid.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
-      package: package()
+      package: package(),
+      test_coverage: [ignore_modules: [Mix.Tasks.GenerateFixtures]]
     ]
   end
 

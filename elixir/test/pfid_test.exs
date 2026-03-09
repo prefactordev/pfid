@@ -177,6 +177,36 @@ defmodule PfidTest do
     test "returns error for non-string" do
       {:error, %PfidError{code: :invalid_pfid}} = Pfid.decode(123)
     end
+
+    test "returns error for valid-length string with invalid Crockford character" do
+      # 'i' is not valid in Crockford Base32 (excluded to avoid confusion with 1/l)
+      invalid_pfid = "0" <> String.duplicate("0", 30) <> "i"
+      {:error, %PfidError{code: :invalid_pfid}} = Pfid.decode(invalid_pfid)
+    end
+  end
+
+  describe "decode_partition/1" do
+    test "decodes valid partition bytes" do
+      # "000000" decodes to partition 0
+      {:ok, 0} = Pfid.decode_partition("000000")
+    end
+
+    test "returns error for non-binary or wrong-size input" do
+      {:error, %PfidError{code: :invalid_partition}} = Pfid.decode_partition(123)
+      {:error, %PfidError{code: :invalid_partition}} = Pfid.decode_partition("short")
+    end
+
+    test "returns error for partition bytes with invalid Crockford character" do
+      # 'i' is not valid in Crockford Base32
+      {:error, %PfidError{code: :invalid_partition}} = Pfid.decode_partition("00000i")
+    end
+
+    test "invalid_partition error includes message" do
+      {:error, %PfidError{code: :invalid_partition, message: msg}} =
+        Pfid.decode_partition("00000i")
+
+      assert msg =~ "invalid partition"
+    end
   end
 
   describe "extract_partition/1" do

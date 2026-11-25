@@ -1,0 +1,33 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /typescript
+    schedule:
+      interval: weekly
+    groups:
+      npm-dev:
+        patterns: ["*"]
+
+  - package-ecosystem: pip
+    directory: /python
+    schedule:
+      interval: weekly
+    groups:
+      python-dev:
+        patterns: ["*"]
+
+  - package-ecosystem: mix
+    directory: /elixir
+    schedule:
+      interval: weekly
+    groups:
+      mix-dev:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

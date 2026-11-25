@@ -5,7 +5,4 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     globals: true,
   },
-  esbuild: {
-    target: 'node20',
-  },
 });

@@ -22,16 +22,12 @@ jobs:
       matrix:
         # Supported Elixir/OTP pairs, per
         # https://hexdocs.pm/elixir/compatibility-and-deprecations.html
-        # (Elixir 1.18.4+ also supports OTP 28.)
+        # (Elixir 1.18.4+ also supports OTP 28.) Minimum is OTP 27, the oldest
+        # OTP release still supported upstream, which in turn means Elixir 1.17.
         include:
-          - { elixir: "1.15", otp: "26" }
-          - { elixir: "1.16", otp: "26" }
-          - { elixir: "1.17", otp: "26" }
           - { elixir: "1.17", otp: "27" }
-          - { elixir: "1.18", otp: "26" }
           - { elixir: "1.18", otp: "27" }
           - { elixir: "1.18", otp: "28" }
-          - { elixir: "1.19", otp: "26" }
           - { elixir: "1.19", otp: "27" }
           - { elixir: "1.19", otp: "28" }
           - { elixir: "1.20", otp: "27" }
